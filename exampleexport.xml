@@ -1,6 +1,6 @@
 <export>
 	<aosettings>
-		<acclude>true</acclude>
+		<occlude>true</occlude>
 		<recive>true</recive>
 		<raycount>256</raycount>
 		<raylength>64</raylength>
@@ -43,7 +43,7 @@
 			<shader>turrem.bioGlow</shader>
 			<uniform>4</uniform>
 			<aosettings>
-				<acclude>false</acclude>
+				<occlude>false</occlude>
 				<recive>false</recive>
 			</aosettings>
 		</layer>

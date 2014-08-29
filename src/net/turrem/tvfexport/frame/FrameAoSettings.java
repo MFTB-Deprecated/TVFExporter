@@ -1,60 +1,82 @@
 package net.turrem.tvfexport.frame;
 
+import java.util.Map;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-public class FrameAoSettings
+public class FrameAoSettings extends Frame
 {
-	public boolean recive;
-	public boolean occlude;
-	public int rayCount;
-	public int rayLength;
-	
-	public FrameAoSettings(boolean recive, boolean occlude, int rayCount, int rayLength)
+	public String recive;
+	public String occlude;
+	public String rayCount;
+	public String rayLength;
+
+	public FrameAoSettings(String recive, String occlude, String rayCount, String rayLength)
 	{
 		this.recive = recive;
 		this.occlude = occlude;
 		this.rayCount = rayCount;
 		this.rayLength = rayLength;
 	}
-	
+
 	public FrameAoSettings(FrameAoSettings parent)
 	{
 		this(parent.recive, parent.occlude, parent.rayCount, parent.rayLength);
 	}
-	
-	public FrameAoSettings(Node node)
+
+	public FrameAoSettings(Node node, ExportFrame export) throws TVFBuildSetupException
 	{
-		this.read(node);
+		this.read(node, export);
 	}
-	
-	public FrameAoSettings(FrameAoSettings parent, Node node)
+
+	public FrameAoSettings(FrameAoSettings parent, Node node, ExportFrame export) throws TVFBuildSetupException
 	{
 		this(parent);
-		this.read(node);
+		this.read(node, export);
 	}
-	
-	public void read(Node aosettingsNode)
+
+	private void read(Node aosettingsNode, ExportFrame export) throws TVFBuildSetupException
 	{
 		NodeList list = aosettingsNode.getChildNodes();
 		for (int i = 0; i < list.getLength(); i++)
 		{
 			Node item = list.item(i);
-			switch (item.getNodeName().toLowerCase())
+			if (item.getNodeType() == Node.ELEMENT_NODE)
 			{
-				case "recive":
-					this.recive = Boolean.parseBoolean(item.getNodeValue());
-					break;
-				case "occlude":
-					this.occlude = Boolean.parseBoolean(item.getNodeValue());
-					break;
-				case "raycount":
-					this.rayCount = Integer.parseInt(item.getNodeValue());
-					break;
-				case "raylength":
-					this.rayLength = Integer.parseInt(item.getNodeValue());
-					break;
+				switch (item.getNodeName().toLowerCase())
+				{
+					case "recive":
+						this.recive = item.getTextContent();
+						break;
+					case "occlude":
+						this.occlude = item.getTextContent();
+						break;
+					case "raycount":
+						this.rayCount = item.getTextContent();
+						break;
+					case "raylength":
+						this.rayLength = item.getTextContent();
+						break;
+					default:
+						throw new TVFBuildSetupException("Unknown node: " + item.getNodeName());
+				}
 			}
 		}
+	}
+
+	@Override
+	public void overrideSelf(Map<String, String> overrides)
+	{
+		this.occlude = this.overrideValue(this.occlude, overrides);
+		this.rayCount = this.overrideValue(this.rayCount, overrides);
+		this.rayLength = this.overrideValue(this.rayLength, overrides);
+		this.recive = this.overrideValue(this.recive, overrides);
+	}
+
+	@Override
+	public Frame duplicate()
+	{
+		return new FrameAoSettings(this);
 	}
 }
