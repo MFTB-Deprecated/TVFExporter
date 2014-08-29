@@ -1,0 +1,102 @@
+<export>
+	<aosettings>
+		<acclude>true</acclude>
+		<recive>true</recive>
+		<raycount>256</raycount>
+		<raylength>64</raylength>
+	</aosettings>
+	<abstracttvf name="plant">
+		<file>$file</file>
+		<layer type="SHADER">
+			<show>0</show>
+			<vox>$plantvox</vox>
+			<shader>core.plantShade</shader>
+			<uniform>1</uniform>
+		</layer>
+	</abstracttvf>
+	<abstracttvf name="tree" extends="plant">
+		<overrides>
+			<plantvox>$treeLeaves</plantvox>
+		</overrides>
+		<layer type="COLOR">
+			<show>2</show>
+			<vox>$treeTruck</vox>
+		</layer>
+	</abstracttvf>
+	<abstracttvf name="bush" extends="plant">
+		<overrides>
+			<file>$outfile</file>
+		</overrides>
+	</abstracttvf>
+	<tvf extends="tree">
+		<overrides>
+			<file>tree.oak</file>
+			<treeTruck>tree.oakTrunk</treeTruck>
+			<treeLeaves>tree.oakLeaves</treeLeaves>
+		</overrides>
+	</tvf>
+	<tvf extends="tree">
+		<file>tree.glow</file>
+		<layer type="SHADER">
+			<show>3</show>
+			<vox>tree.glowGlow</vox>
+			<shader>turrem.bioGlow</shader>
+			<uniform>4</uniform>
+			<aosettings>
+				<acclude>false</acclude>
+				<recive>false</recive>
+			</aosettings>
+		</layer>
+		<overrides>
+			<treeTruck>tree.glowTrunk</treeTruck>
+			<treeLeaves>tree.glowLeaves</treeLeaves>
+		</overrides>
+	</tvf>
+	<tvf>
+		<file>flag</file>
+		<layer type="COLOR">
+			<vox>flagPole</vox>
+			<show>0</show>
+		</layer>
+		<layer type="DYNAMIC">
+			<vox>flag</vox>
+			<show>2</show>
+			<color>1</color>
+			<mix>MULT</mix>
+		</layer>
+	</tvf>
+	<abstracttvf name="basicrock">
+		<layer type="COLOR">
+			<vox>$vox</vox>
+			<show>0</show>
+		</layer>
+	</abstracttvf>
+	<tvf extends="basicrock">
+		<file>rock.basic.1</file>
+		<overrides>
+			<vox>rock.basic.1</vox>
+		</overrides>
+	</tvf>
+	<tvf extends="basicrock">
+		<file>rock.basic.2</file>
+		<overrides>
+			<vox>rock.basic.2</vox>
+		</overrides>
+	</tvf>
+	<overridetvf extends="bush">
+		<outfile>bush.3</outfile>
+		<plantvox>bush.blueBush</plantvox>
+	</overridetvf>
+	<overridetvf extends="bushsimple">
+		<bush>bush.1</bush>
+	</overridetvf>
+	<overridetvf extends="bushsimple">
+		<bush>bush.2</bush>
+	</overridetvf>
+	<abstracttvf name="bushsimple" extends="bush">
+		<overrides>
+			<outfile>$bush</outfile>
+			<plantvox>$bush</plantvox>
+		</overrides>
+	</abstracttvf>
+</export>

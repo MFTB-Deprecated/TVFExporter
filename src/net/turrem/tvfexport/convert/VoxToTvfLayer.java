@@ -1,4 +1,4 @@
-package net.turrem.tvfexport;
+package net.turrem.tvfexport.convert;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -15,18 +15,19 @@ import net.turrem.utils.geo.EnumDir;
 
 public class VoxToTvfLayer
 {
-	protected static Urchin urchin = new Urchin(32, 128);
-
 	protected TVFLayerFaces tvf;
 	protected VOXFile vox;
 
-	private HashSet<Short> usedColors = new HashSet<Short>();
+	private HashSet<Byte> usedColors = new HashSet<Byte>();
 	private ArrayList<TVFFace> faces = new ArrayList<TVFFace>();
+	
+	protected Urchin urchin;
 
-	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox)
+	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox, Urchin urchin)
 	{
 		this.tvf = tvf;
 		this.vox = vox;
+		this.urchin = urchin;
 	}
 
 	public TVFLayerFaces make()
@@ -84,8 +85,7 @@ public class VoxToTvfLayer
 									}
 								}
 								this.faces.add(f);
-								this.usedColors.add((short) (v & 0xFF));
-
+								this.usedColors.add(v);
 							}
 						}
 					}
@@ -165,16 +165,14 @@ public class VoxToTvfLayer
 		if (this.tvf.palette instanceof TVFPaletteColor)
 		{
 			TVFPaletteColor pal = (TVFPaletteColor) this.tvf.palette;
-			int i = 0;
-			Iterator<Short> it = this.usedColors.iterator();
+			Iterator<Byte> it = this.usedColors.iterator();
 
 			while (it.hasNext())
 			{
-				short id = it.next();
+				int id = it.next() & 0xFF;
 				VOXFile.VOXColor c = this.vox.colors[id];
 				TVFColor C = new TVFColor(c.r << 2, c.g << 2, c.b << 2);
-				pal.palette[i] = C;
-				i++;
+				pal.palette[id] = C;
 			}
 		}
 
