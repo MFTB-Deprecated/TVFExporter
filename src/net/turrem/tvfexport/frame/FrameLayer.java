@@ -10,6 +10,10 @@ public class FrameLayer extends Frame
 	public FrameAoSettings ao;
 	public String show;
 	public String vox;
+	
+	public String xOffset = "0";
+	public String yOffset = "0";
+	public String zOffset = "0";
 
 	public FrameLayer(Node layer, ExportFrame export) throws TVFBuildSetupException
 	{
@@ -35,6 +39,15 @@ public class FrameLayer extends Frame
 				return true;
 			case "vox":
 				this.vox = item.getTextContent();
+				return true;
+			case "x":
+				this.xOffset = item.getTextContent();
+				return true;
+			case "y":
+				this.yOffset = item.getTextContent();
+				return true;
+			case "z":
+				this.zOffset = item.getTextContent();
 				return true;
 			default:
 				return false;

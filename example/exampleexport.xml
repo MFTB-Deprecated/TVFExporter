@@ -63,6 +63,14 @@
 			<show>2</show>
 			<color>1</color>
 			<mix>MULT</mix>
+			<y>12</y>
+		</layer>
+		<layer type="DYNAMIC">
+			<vox>flag</vox>
+			<show>3</show>
+			<color>1</color>
+			<mix>MULT</mix>
+			<y>4</y>
 		</layer>
 	</tvf>
 	<abstracttvf name="basicrock">
@@ -99,4 +107,25 @@
 			<plantvox>$bush</plantvox>
 		</overrides>
 	</abstracttvf>
+	<tvf>
+		<file>rock.clump</file>
+		<layer type="COLOR">
+			<vox>rock.basic.1</vox>
+			<show>0</show>
+			<x>5</x>
+			<z>9</z>
+		</layer>
+		<layer type="COLOR">
+			<vox>rock.basic.2</vox>
+			<show>0</show>
+			<x>9</x>
+			<z>-3</z>
+		</layer>
+		<layer type="COLOR">
+			<vox>rock.basic.1</vox>
+			<show>0</show>
+			<x>-3</x>
+			<z>4</z>
+		</layer>
+	</tvf>
 </export>
