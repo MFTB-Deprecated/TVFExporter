@@ -24,15 +24,25 @@
 		</layer>
 	</abstracttvf>
 	<abstracttvf name="bush" extends="plant">
+		<w>5</w>
+		<l>5</l>
+		<h>5</h>
+		<x>-2</x>
+		<z>-2</z>
 		<overrides>
 			<file>$outfile</file>
 		</overrides>
 	</abstracttvf>
 	<tvf extends="tree">
+		<x>-3</x>
+		<z>-3</z>
+		<w>7</w>
+		<l>7</l>
+		<h>12</h>
 		<overrides>
-			<file>tree.oak</file>
-			<treeTruck>tree.oakTrunk</treeTruck>
-			<treeLeaves>tree.oakLeaves</treeLeaves>
+			<file>tree.pine</file>
+			<treeTruck>tree.pineTrunk</treeTruck>
+			<treeLeaves>tree.pineLeaves</treeLeaves>
 		</overrides>
 	</tvf>
 	<tvf extends="tree">
@@ -47,13 +57,24 @@
 				<recive>false</recive>
 			</aosettings>
 		</layer>
+		<x>-3</x>
+		<z>-3</z>
+		<w>7</w>
+		<l>7</l>
+		<h>12</h>
 		<overrides>
 			<treeTruck>tree.glowTrunk</treeTruck>
 			<treeLeaves>tree.glowLeaves</treeLeaves>
 		</overrides>
+
 	</tvf>
 	<tvf>
 		<file>flag</file>
+		<x>-3</x>
+		<z>-3</z>
+		<w>7</w>
+		<l>7</l>
+		<h>12</h>
 		<layer type="COLOR">
 			<vox>flagPole</vox>
 			<show>0</show>
@@ -63,17 +84,22 @@
 			<show>2</show>
 			<color>1</color>
 			<mix>MULT</mix>
-			<y>12</y>
+			<y>6</y>
 		</layer>
 		<layer type="DYNAMIC">
 			<vox>flag</vox>
 			<show>3</show>
 			<color>1</color>
 			<mix>MULT</mix>
-			<y>4</y>
+			<y>3</y>
 		</layer>
 	</tvf>
 	<abstracttvf name="basicrock">
+		<w>4</w>
+		<l>4</l>
+		<h>4</h>
+		<x>-2</x>
+		<z>-2</z>
 		<layer type="COLOR">
 			<vox>$vox</vox>
 			<show>0</show>
@@ -109,6 +135,11 @@
 	</abstracttvf>
 	<tvf>
 		<file>rock.clump</file>
+		<w>16</w>
+		<l>16</l>
+		<h>4</h>
+		<x>-8</x>
+		<z>-8</z>
 		<layer type="COLOR">
 			<vox>rock.basic.1</vox>
 			<show>0</show>

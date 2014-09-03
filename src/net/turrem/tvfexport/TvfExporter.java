@@ -44,6 +44,8 @@ public class TvfExporter
 		if (urchin == null || this.lastCount != count || this.lastLength != length)
 		{
 			this.urchin = new Urchin(length, count);
+			this.lastCount = count;
+			this.lastLength = length;
 		}
 	}
 }

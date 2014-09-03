@@ -77,6 +77,9 @@ public class FrameLayer extends Frame
 		this.show = this.overrideValue(this.show, overrides);
 		this.vox = this.overrideValue(this.vox, overrides);
 		this.ao.overrideSelf(overrides);
+		this.xOffset = this.overrideValue(this.xOffset, overrides);
+		this.yOffset = this.overrideValue(this.yOffset, overrides);
+		this.zOffset = this.overrideValue(this.zOffset, overrides);
 	}
 
 	@Override
