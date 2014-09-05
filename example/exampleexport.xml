@@ -8,7 +8,6 @@
 	<abstracttvf name="plant">
 		<file>$file</file>
 		<layer type="SHADER">
-			<show>0</show>
 			<vox>$plantvox</vox>
 			<shader>core.plantShade</shader>
 			<uniform>1</uniform>
@@ -19,7 +18,6 @@
 			<plantvox>$treeLeaves</plantvox>
 		</overrides>
 		<layer type="COLOR">
-			<show>2</show>
 			<vox>$treeTruck</vox>
 		</layer>
 	</abstracttvf>
@@ -48,7 +46,6 @@
 	<tvf extends="tree">
 		<file>tree.glow</file>
 		<layer type="SHADER">
-			<show>3</show>
 			<vox>tree.glowGlow</vox>
 			<shader>turrem.bioGlow</shader>
 			<uniform>4</uniform>
@@ -77,21 +74,12 @@
 		<h>12</h>
 		<layer type="COLOR">
 			<vox>flagPole</vox>
-			<show>0</show>
 		</layer>
 		<layer type="DYNAMIC">
 			<vox>flag</vox>
-			<show>2</show>
 			<color>1</color>
 			<mix>MULT</mix>
 			<y>6</y>
-		</layer>
-		<layer type="DYNAMIC">
-			<vox>flag</vox>
-			<show>3</show>
-			<color>1</color>
-			<mix>MULT</mix>
-			<y>3</y>
 		</layer>
 	</tvf>
 	<abstracttvf name="basicrock">
@@ -102,7 +90,6 @@
 		<z>-2</z>
 		<layer type="COLOR">
 			<vox>$vox</vox>
-			<show>0</show>
 		</layer>
 	</abstracttvf>
 	<tvf extends="basicrock">
@@ -142,19 +129,16 @@
 		<z>-8</z>
 		<layer type="COLOR">
 			<vox>rock.basic.1</vox>
-			<show>0</show>
 			<x>5</x>
 			<z>9</z>
 		</layer>
 		<layer type="COLOR">
 			<vox>rock.basic.2</vox>
-			<show>0</show>
 			<x>9</x>
 			<z>-3</z>
 		</layer>
 		<layer type="COLOR">
 			<vox>rock.basic.1</vox>
-			<show>0</show>
 			<x>-3</x>
 			<z>4</z>
 		</layer>

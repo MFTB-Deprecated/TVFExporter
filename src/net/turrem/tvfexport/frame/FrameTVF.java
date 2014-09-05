@@ -12,6 +12,13 @@ public class FrameTVF extends Frame
 	public HashMap<String, String> theOverrides = new HashMap<String, String>();
 	public ArrayList<FrameLayer> theLayers = new ArrayList<FrameLayer>();
 	public String file = null;
+	
+	public String xOffset = "0";
+	public String yOffset = "0";
+	public String zOffset = "0";
+	public String width;
+	public String height;
+	public String length;
 
 	public FrameTVF(FrameTVF tvf)
 	{
@@ -21,6 +28,13 @@ public class FrameTVF extends Frame
 			this.theLayers.add((FrameLayer) layer.duplicate());
 		}
 		this.file = tvf.file;
+		this.xOffset = tvf.xOffset;
+		this.yOffset = tvf.yOffset;
+		this.zOffset = tvf.zOffset;
+		this.width = tvf.width;
+		this.length = tvf.length;
+		this.height = tvf.height;
+		
 	}
 
 	public FrameTVF(Node node, FrameTVF parent, ExportFrame export) throws TVFBuildSetupException
@@ -56,6 +70,24 @@ public class FrameTVF extends Frame
 							break;
 						case "overrides":
 							this.readOverrideOnly(item, export);
+							break;
+						case "x":
+							this.xOffset = item.getTextContent();
+							break;
+						case "y":
+							this.yOffset = item.getTextContent();
+							break;
+						case "z":
+							this.zOffset = item.getTextContent();
+							break;
+						case "w":
+							this.width = item.getTextContent();
+							break;
+						case "l":
+							this.length = item.getTextContent();
+							break;
+						case "h":
+							this.height = item.getTextContent();
 							break;
 						default:
 							throw new TVFBuildSetupException("Unknown node: " + item.getNodeName());
@@ -119,6 +151,12 @@ public class FrameTVF extends Frame
 		{
 			layer.overrideSelf(overrides);
 		}
+		this.xOffset = this.overrideValue(this.xOffset, overrides);
+		this.yOffset = this.overrideValue(this.yOffset, overrides);
+		this.zOffset = this.overrideValue(this.zOffset, overrides);
+		this.width = this.overrideValue(this.width, overrides);
+		this.length = this.overrideValue(this.length, overrides);
+		this.height = this.overrideValue(this.height, overrides);
 	}
 
 	@Override

@@ -8,7 +8,6 @@ import org.w3c.dom.NodeList;
 public class FrameLayer extends Frame
 {
 	public FrameAoSettings ao;
-	public String show;
 	public String vox;
 	
 	public String xOffset = "0";
@@ -23,8 +22,10 @@ public class FrameLayer extends Frame
 	public FrameLayer(FrameLayer layer)
 	{
 		this.ao = (FrameAoSettings) layer.ao.duplicate();
-		this.show = layer.show;
 		this.vox = layer.vox;
+		this.xOffset = layer.xOffset;
+		this.yOffset = layer.yOffset;
+		this.zOffset = layer.zOffset;
 	}
 
 	public boolean readNodeItem(Node item, String name, ExportFrame export) throws TVFBuildSetupException
@@ -33,9 +34,6 @@ public class FrameLayer extends Frame
 		{
 			case "aosettings":
 				this.ao = new FrameAoSettings(this.ao, item, export);
-				return true;
-			case "show":
-				this.show = item.getTextContent();
 				return true;
 			case "vox":
 				this.vox = item.getTextContent();
@@ -74,7 +72,6 @@ public class FrameLayer extends Frame
 	@Override
 	public void overrideSelf(Map<String, String> overrides)
 	{
-		this.show = this.overrideValue(this.show, overrides);
 		this.vox = this.overrideValue(this.vox, overrides);
 		this.ao.overrideSelf(overrides);
 		this.xOffset = this.overrideValue(this.xOffset, overrides);
