@@ -6,11 +6,8 @@ import java.util.Iterator;
 
 import net.turrem.tvf.color.TVFColor;
 import net.turrem.tvf.color.TVFPaletteColor;
-import net.turrem.tvf.face.EnumLightingType;
 import net.turrem.tvf.face.TVFFace;
 import net.turrem.tvf.layer.TVFLayerFaces;
-import net.turrem.utils.ao.AORay;
-import net.turrem.utils.ao.Urchin;
 import net.turrem.utils.geo.EnumDir;
 
 public class VoxToTvfLayer
@@ -20,14 +17,11 @@ public class VoxToTvfLayer
 
 	private HashSet<Byte> usedColors = new HashSet<Byte>();
 	private ArrayList<TVFFace> faces = new ArrayList<TVFFace>();
-	
-	protected Urchin urchin;
 
-	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox, Urchin urchin)
+	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox)
 	{
 		this.tvf = tvf;
 		this.vox = vox;
-		this.urchin = urchin;
 	}
 
 	public TVFLayerFaces make()
@@ -60,30 +54,12 @@ public class VoxToTvfLayer
 
 							if (this.isOutside(x, y, z, 0) || this.getVox(x, y, z) == (byte) 0xFF)
 							{
-								TVFFace f = new TVFFace(this.tvf.prelightType);
+								TVFFace f = new TVFFace();
 								f.x = (byte) (i & 0xFF);
 								f.y = (byte) (j & 0xFF);
 								f.z = (byte) (k & 0xFF);
 								f.direction = dir.ind;
 								f.color = v;
-								if (this.tvf.prelightType != EnumLightingType.NONE)
-								{
-									float ao = this.getAO(urchin, i, j, k, dir);
-									ao *= 2;
-									if (ao > 1)
-									{
-										ao = 1;
-									}
-									byte bl = (byte) (ao * 255);
-									if (this.tvf.prelightType == EnumLightingType.SMOOTH)
-									{
-										f.lighting = new byte[] { bl, bl, bl, bl };
-									}
-									else if (this.tvf.prelightType == EnumLightingType.SOLID)
-									{
-										f.lighting = new byte[] { bl };
-									}
-								}
 								this.faces.add(f);
 								this.usedColors.add(v);
 							}
@@ -91,72 +67,6 @@ public class VoxToTvfLayer
 					}
 				}
 			}
-		}
-	}
-
-	public float getAO(Urchin urchin, int x, int y, int z, EnumDir dir)
-	{
-		float ao = 0.0F;
-		for (int i = 0; i < urchin.rays.length; i++)
-		{
-			boolean hit = false;
-			AORay r = urchin.rays[i];
-			for (int j = 0; j < r.points.length; j++)
-			{
-				int px = r.points[j].x + x;
-				int py = r.points[j].y + y;
-				int pz = r.points[j].z + z;
-				if (px >= this.vox.width || px < 0 || py >= this.vox.height || py < 0 || pz >= this.vox.length || pz < 0)
-				{
-					break;
-				}
-				else if (this.getVox(px, py, pz) != (byte) 0xFF)
-				{
-					hit = true;
-					break;
-				}
-			}
-			if (!hit)
-			{
-				switch (dir)
-				{
-					case XUp:
-						ao += r.xd;
-						break;
-					case XDown:
-						ao += r.xu;
-						break;
-					case YUp:
-						ao += r.yd;
-						break;
-					case YDown:
-						ao += r.yu;
-						break;
-					case ZUp:
-						ao += r.zd;
-						break;
-					case ZDown:
-						ao += r.zu;
-						break;
-				}
-			}
-		}
-		switch (dir)
-		{
-			case XUp:
-				return ao / urchin.xd;
-			case XDown:
-				return ao / urchin.xu;
-			case YUp:
-				return ao / urchin.yd;
-			case YDown:
-				return ao / urchin.yu;
-			case ZUp:
-				return ao / urchin.zd;
-			case ZDown:
-				return ao / urchin.zu;
-			default:
-				return 0;
 		}
 	}
 
