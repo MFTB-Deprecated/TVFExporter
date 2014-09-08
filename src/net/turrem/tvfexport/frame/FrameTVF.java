@@ -12,7 +12,7 @@ public class FrameTVF extends Frame
 	public HashMap<String, String> theOverrides = new HashMap<String, String>();
 	public ArrayList<FrameLayer> theLayers = new ArrayList<FrameLayer>();
 	public String file = null;
-	
+
 	public String xOffset = "0";
 	public String yOffset = "0";
 	public String zOffset = "0";
@@ -20,29 +20,34 @@ public class FrameTVF extends Frame
 	public String height;
 	public String length;
 
-	public FrameTVF(FrameTVF tvf)
+	private FrameTVF(FrameTVF tvf)
 	{
-		this.theOverrides = tvf.theOverrides;
-		for (FrameLayer layer : tvf.theLayers)
-		{
-			this.theLayers.add((FrameLayer) layer.duplicate());
-		}
-		this.file = tvf.file;
-		this.xOffset = tvf.xOffset;
-		this.yOffset = tvf.yOffset;
-		this.zOffset = tvf.zOffset;
-		this.width = tvf.width;
-		this.length = tvf.length;
-		this.height = tvf.height;
-		
+		this.copyValues(tvf);
 	}
 
 	public FrameTVF(Node node, FrameTVF parent, ExportFrame export) throws TVFBuildSetupException
 	{
+		this.copyValues(parent);
 		this.read(node, export);
-		if (parent != null)
+		this.overrideSelf(this.theOverrides);
+	}
+	
+	private void copyValues(FrameTVF tvf)
+	{
+		if (tvf != null)
 		{
-			this.extend(parent);
+			this.theOverrides = tvf.theOverrides;
+			for (FrameLayer layer : tvf.theLayers)
+			{
+				this.theLayers.add((FrameLayer) layer.duplicate());
+			}
+			this.file = tvf.file;
+			this.xOffset = tvf.xOffset;
+			this.yOffset = tvf.yOffset;
+			this.zOffset = tvf.zOffset;
+			this.width = tvf.width;
+			this.length = tvf.length;
+			this.height = tvf.height;
 		}
 	}
 
@@ -129,18 +134,6 @@ public class FrameTVF extends Frame
 			default:
 				throw new TVFBuildSetupException("Layer does not have valid type");
 		}
-	}
-
-	public void extend(FrameTVF parent)
-	{
-		FrameTVF newpar = (FrameTVF) parent.overrideNew(this.theOverrides);
-		if (this.file == null)
-		{
-			this.file = newpar.file;
-		}
-		ArrayList<FrameLayer> nl = newpar.theLayers;
-		nl.addAll(this.theLayers);
-		this.theLayers = nl;
 	}
 
 	@Override

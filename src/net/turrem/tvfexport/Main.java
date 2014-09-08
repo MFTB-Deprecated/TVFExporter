@@ -19,9 +19,11 @@ public class Main
 	{
 		TvfExporter export = new TvfExporter();
 		
+		String dir = System.getProperty("user.dir");
+		
 		try
 		{
-			File file = new File(args[2]);
+			File file = new File(dir + args[2]);
 			DocumentBuilder dBuilder;
 			dBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			Document doc = dBuilder.parse(file);
@@ -33,6 +35,6 @@ public class Main
 			e.printStackTrace();
 		}
 		
-		export.export(args[0], args[1]);
+		export.export(dir + args[0], dir + args[1]);
 	}
 }

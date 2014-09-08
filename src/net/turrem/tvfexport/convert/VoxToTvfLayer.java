@@ -8,30 +8,33 @@ import net.turrem.tvf.color.TVFColor;
 import net.turrem.tvf.color.TVFPaletteColor;
 import net.turrem.tvf.face.TVFFace;
 import net.turrem.tvf.layer.TVFLayerFaces;
+import net.turrem.utils.ao.Urchin;
 import net.turrem.utils.geo.EnumDir;
 
 public class VoxToTvfLayer
 {
 	protected TVFLayerFaces tvf;
 	protected VOXFile vox;
+	protected Urchin urchin;
 
 	private HashSet<Byte> usedColors = new HashSet<Byte>();
 	private ArrayList<TVFFace> faces = new ArrayList<TVFFace>();
 
-	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox)
+	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox, Urchin urchin)
 	{
 		this.tvf = tvf;
 		this.vox = vox;
+		this.urchin = urchin;
 	}
 
-	public TVFLayerFaces make()
+	public TVFLayerFaces make(TvfBuilder builder)
 	{
-		this.build();
+		this.build(builder);
 		this.convert();
 		return this.tvf;
 	}
 
-	private void build()
+	private void build(TvfBuilder builder)
 	{
 		EnumDir[] dirs = EnumDir.values();
 
@@ -47,12 +50,8 @@ public class VoxToTvfLayer
 						for (int d = 0; d < dirs.length; d++)
 						{
 							EnumDir dir = dirs[d];
-
-							int x = i + dir.xoff;
-							int y = j + dir.yoff;
-							int z = k + dir.zoff;
-
-							if (this.isOutside(x, y, z, 0) || this.getVox(x, y, z) == (byte) 0xFF)
+							
+							if (builder.isOpen(i, j, k, dir))
 							{
 								TVFFace f = new TVFFace();
 								f.x = (byte) (i & 0xFF);
@@ -87,11 +86,6 @@ public class VoxToTvfLayer
 		}
 
 		this.tvf.faces.addAll(this.faces);
-	}
-
-	private boolean isOutside(int x, int y, int z, int d)
-	{
-		return (x >= this.vox.width + d || x < 0 - d || y >= this.vox.height + d || y < 0 - d || z >= this.vox.length + d || z < 0 - d);
 	}
 
 	private byte getVox(int x, int y, int z)
