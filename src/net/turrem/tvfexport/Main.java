@@ -21,6 +21,13 @@ public class Main
 		
 		String dir = System.getProperty("user.dir");
 		
+		boolean compress = true;
+		
+		if (args.length >= 4)
+		{
+			compress = Boolean.parseBoolean(args[3]);
+		}
+		
 		try
 		{
 			File file = new File(dir + args[2]);
@@ -35,6 +42,6 @@ public class Main
 			e.printStackTrace();
 		}
 		
-		export.export(dir + args[0], dir + args[1]);
+		export.export(dir + args[0], dir + args[1], compress);
 	}
 }

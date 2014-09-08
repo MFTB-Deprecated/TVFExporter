@@ -17,14 +17,17 @@ public class TvfExporter
 	public Urchin urchin = null;
 	private int lastCount;
 	private int lastLength;
+	
+	public boolean compress;
 
 	public void addFrames(ExportFrame frame)
 	{
 		this.frames.addAll(frame.tvfs);
 	}
 
-	public void export(String indir, String outdir)
+	public void export(String indir, String outdir, boolean compress)
 	{
+		this.compress = compress;
 		while (!this.frames.isEmpty())
 		{
 			this.exportSingle(this.frames.poll(), indir, outdir);
@@ -45,7 +48,7 @@ public class TvfExporter
 			File file = new File(filen);
 			file.getParentFile().mkdirs();
 			file.createNewFile();
-			TVFFile.write(file, tvf);
+			TVFFile.write(file, tvf, this.compress);
 		}
 		catch (IOException | NumberFormatException e)
 		{

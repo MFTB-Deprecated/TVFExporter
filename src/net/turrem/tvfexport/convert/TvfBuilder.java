@@ -19,12 +19,14 @@ import net.turrem.tvfexport.frame.FrameLayer;
 import net.turrem.tvfexport.frame.FrameLayerDynamic;
 import net.turrem.tvfexport.frame.FrameLayerShader;
 import net.turrem.tvfexport.frame.FrameTVF;
+import net.turrem.utils.ao.AORay;
+import net.turrem.utils.ao.Urchin;
 import net.turrem.utils.geo.EnumDir;
 import net.turrem.utils.geo.VoxelGeoUtils;
 
 public class TvfBuilder
 {
-	public static final float closeAoPower = 0.2F;
+	public static final float aoPower = 0.8F;
 	
 	public FrameTVF frame;
 	public TVFFile tvf;
@@ -162,7 +164,7 @@ public class TvfBuilder
 				open &= this.isOpen(x - vox.xOffset, y - vox.yOffset, z - vox.zOffset, vox);
 			}
 		}
-		return open;
+		return !open;
 	}
 
 	protected boolean isOpen(int x, int y, int z, VoxHolder vox)
@@ -192,27 +194,46 @@ public class TvfBuilder
 		return vox.vox.voxels[(x * vox.vox.length + z) * vox.vox.height + (vox.vox.height - y - 1)];
 	}
 
-	public void doFaceAo(TVFFace face, int i, int j, int k)
+	public void doFaceAo(TVFFace face, int x, int y, int z)
 	{
 		face.lighting = new byte[] {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
-		this.doFaceCloseAo(face, i, j, k);
-	}
-	
-	private void doFaceCloseAo(TVFFace face, int x, int y, int z)
-	{
+		Urchin urc = this.export.urchin;
 		for (int i = 0; i < 4; i++)
 		{
-			int[][] occluders = VoxelGeoUtils.getOccludingVoxels(EnumDir.values()[face.direction], i);
-			boolean[] edges = new boolean[3];
-			for (int j = 0; j < 3; j++)
-			{
-				edges[j] = !this.voxelOccludes(occluders[j][0] + x, occluders[j][1] + y, occluders[j][2] + z);
-			}
-			float occ = VoxelGeoUtils.vertexOcclude(edges[0], edges[1], edges[2]);
-			face.lighting[i] = this.occludeByte(face.lighting[i], occ, closeAoPower);
+			EnumDir dir = EnumDir.values()[face.direction];
+			int[][] off = VoxelGeoUtils.getOccludingVoxels(dir, i);
+			float occ = 0.0F;
+			occ += this.doRayCast(x, y, z, urc, dir);
+			occ += this.doRayCast(x + off[0][0], y + off[0][1], z + off[0][2], urc, dir);
+			occ += this.doRayCast(x + off[1][0], y + off[1][1], z + off[1][2], urc, dir);
+			occ += this.doRayCast(x + off[2][0], y + off[2][1], z + off[2][2], urc, dir);
+			occ /= 4.0F;
+			face.lighting[i] = this.occludeByte(face.lighting[i], occ, aoPower);
 		}
 	}
 	
+	private float doRayCast(int x, int y, int z, Urchin urc, EnumDir dir)
+	{
+		float mag = 0.0F;
+		for (AORay ray : urc.rays)
+		{
+			boolean hit = false;
+			for (int i = 0; i < ray.points.length; i++)
+			{
+				if (this.voxelOccludes(ray.points[i].x + x, ray.points[i].y + y, ray.points[i].z + z))
+				{
+					hit = true;
+					break;
+				}
+			}
+			if (!hit)
+			{
+				mag += ray.getMagnitude(dir);
+			}
+		}
+		return mag / urc.getMagnitude(dir);
+	}
+
 	private byte occludeByte(byte light, float occ, float mag)
 	{
 		float lightf = (light & 0xFF) / 255.0F;
