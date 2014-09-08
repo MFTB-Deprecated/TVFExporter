@@ -1,5 +1,6 @@
 *.class
 *.tvf
+example/out/*
 .settings/*
 .classpath
 .project

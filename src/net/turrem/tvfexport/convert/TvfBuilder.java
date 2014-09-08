@@ -12,6 +12,7 @@ import net.turrem.tvf.color.EnumDynamicColorMode;
 import net.turrem.tvf.color.TVFPaletteColor;
 import net.turrem.tvf.color.TVFPaletteDynamic;
 import net.turrem.tvf.color.TVFPaletteShader;
+import net.turrem.tvf.face.TVFFace;
 import net.turrem.tvf.layer.TVFLayerFaces;
 import net.turrem.tvfexport.TvfExporter;
 import net.turrem.tvfexport.frame.FrameLayer;
@@ -19,34 +20,38 @@ import net.turrem.tvfexport.frame.FrameLayerDynamic;
 import net.turrem.tvfexport.frame.FrameLayerShader;
 import net.turrem.tvfexport.frame.FrameTVF;
 import net.turrem.utils.geo.EnumDir;
+import net.turrem.utils.geo.VoxelGeoUtils;
 
 public class TvfBuilder
 {
+	public static final float closeAoPower = 0.2F;
+	
 	public FrameTVF frame;
 	public TVFFile tvf;
 	public File indir;
 	public File outdir;
 	public TvfExporter export;
-	
+
 	public HashMap<String, VoxHolder> voxs = new HashMap<String, VoxHolder>();
-	
+
 	protected static class VoxHolder
 	{
 		public VOXFile vox;
 		public short xOffset;
 		public short yOffset;
 		public short zOffset;
-		
-		public VoxHolder(VOXFile vox, short xOffset, short yOffset, short zOffset)
+		public boolean occludes;
+
+		public VoxHolder(VOXFile vox, short xOffset, short yOffset, short zOffset, boolean occludes)
 		{
-			super();
 			this.vox = vox;
 			this.xOffset = xOffset;
 			this.yOffset = yOffset;
 			this.zOffset = zOffset;
+			this.occludes = occludes;
 		}
 	}
-	
+
 	public TvfBuilder(FrameTVF frame, String indir, String outdir, TvfExporter export) throws FileNotFoundException
 	{
 		this.frame = frame;
@@ -59,7 +64,7 @@ public class TvfBuilder
 		this.export = export;
 		this.tvf = new TVFFile();
 	}
-	
+
 	public TVFFile convert() throws NumberFormatException, IOException
 	{
 		this.loadVox();
@@ -69,7 +74,7 @@ public class TvfBuilder
 		this.tvf.length = Short.parseShort(this.frame.length);
 		return this.tvf;
 	}
-	
+
 	protected void convertLayers()
 	{
 		for (int i = 0; i < this.frame.theLayers.size(); i++)
@@ -80,14 +85,14 @@ public class TvfBuilder
 			VOXFile vox = holder.vox;
 			TVFLayerFaces faces = new TVFLayerFaces();
 			this.convertPalette(layer, faces);
-			(new VoxToTvfLayer(faces, vox, this.export.urchin)).make(this);
+			(new VoxToTvfLayer(faces, vox, this.export.urchin, Boolean.parseBoolean(layer.ao.recive), holder.xOffset, holder.yOffset, holder.zOffset)).make(this);
 			faces.xOffset = holder.xOffset;
 			faces.yOffset = holder.yOffset;
 			faces.zOffset = holder.zOffset;
 			this.tvf.layers.add(faces);
 		}
 	}
-	
+
 	protected void convertPalette(FrameLayer layer, TVFLayerFaces faces)
 	{
 		if (layer instanceof FrameLayerDynamic)
@@ -111,7 +116,7 @@ public class TvfBuilder
 			faces.palette = new TVFPaletteColor();
 		}
 	}
-	
+
 	protected void loadVox() throws FileNotFoundException, IOException
 	{
 		for (FrameLayer layer : this.frame.theLayers)
@@ -127,37 +132,47 @@ public class TvfBuilder
 			int x = Short.parseShort(layer.xOffset) + Short.parseShort(this.frame.xOffset);
 			int y = Short.parseShort(layer.yOffset) + Short.parseShort(this.frame.yOffset);
 			int z = Short.parseShort(layer.zOffset) + Short.parseShort(this.frame.zOffset);
-			VoxHolder holder = new VoxHolder(file, (short) x, (short) y, (short) z);
+			VoxHolder holder = new VoxHolder(file, (short) x, (short) y, (short) z, Boolean.parseBoolean(layer.ao.occlude));
 			this.voxs.put(name, holder);
 		}
 	}
-	
+
 	protected boolean isOpen(int x, int y, int z, EnumDir facedir)
 	{
 		return this.isOpen(x + facedir.xoff, y + facedir.yoff, z + facedir.zoff);
 	}
-	
+
 	protected boolean isOpen(int x, int y, int z)
 	{
 		boolean open = true;
 		for (VoxHolder vox : this.voxs.values())
 		{
-			open &= this.isOpen(x, y, z, vox);
+			open &= this.isOpen(x - vox.xOffset, y - vox.yOffset, z - vox.zOffset, vox);
 		}
 		return open;
 	}
-	
+
+	protected boolean voxelOccludes(int x, int y, int z)
+	{
+		boolean open = true;
+		for (VoxHolder vox : this.voxs.values())
+		{
+			if (vox.occludes)
+			{
+				open &= this.isOpen(x - vox.xOffset, y - vox.yOffset, z - vox.zOffset, vox);
+			}
+		}
+		return open;
+	}
+
 	protected boolean isOpen(int x, int y, int z, VoxHolder vox)
 	{
 		return this.getVoxel(x, y, z, vox) == (byte) 0xFF;
 	}
-	
+
 	protected boolean isOutside(int x, int y, int z, VoxHolder vox)
 	{
-		x -= vox.xOffset;
-		y -= vox.yOffset;
-		z -= vox.zOffset;
-		if (x < 0 || y < 0|| z < 0)
+		if (x < 0 || y < 0 || z < 0)
 		{
 			return true;
 		}
@@ -167,16 +182,49 @@ public class TvfBuilder
 		}
 		return false;
 	}
-	
+
 	protected byte getVoxel(int x, int y, int z, VoxHolder vox)
 	{
 		if (this.isOutside(x, y, z, vox))
 		{
 			return (byte) 0xFF;
 		}
-		x -= vox.xOffset;
-		y -= vox.yOffset;
-		z -= vox.zOffset;
 		return vox.vox.voxels[(x * vox.vox.length + z) * vox.vox.height + (vox.vox.height - y - 1)];
+	}
+
+	public void doFaceAo(TVFFace face, int i, int j, int k)
+	{
+		face.lighting = new byte[] {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
+		this.doFaceCloseAo(face, i, j, k);
+	}
+	
+	private void doFaceCloseAo(TVFFace face, int x, int y, int z)
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			int[][] occluders = VoxelGeoUtils.getOccludingVoxels(EnumDir.values()[face.direction], i);
+			boolean[] edges = new boolean[3];
+			for (int j = 0; j < 3; j++)
+			{
+				edges[j] = !this.voxelOccludes(occluders[j][0] + x, occluders[j][1] + y, occluders[j][2] + z);
+			}
+			float occ = VoxelGeoUtils.vertexOcclude(edges[0], edges[1], edges[2]);
+			face.lighting[i] = this.occludeByte(face.lighting[i], occ, closeAoPower);
+		}
+	}
+	
+	private byte occludeByte(byte light, float occ, float mag)
+	{
+		float lightf = (light & 0xFF) / 255.0F;
+		lightf = (1.0F - mag) * lightf + mag * occ * lightf;
+		if (lightf < 0.0F)
+		{
+			lightf = 0.0F;
+		}
+		if (lightf > 1.0F)
+		{
+			lightf = 1.0F;
+		}
+		return (byte) (lightf * 255.0F);
 	}
 }

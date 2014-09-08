@@ -13,18 +13,29 @@ import net.turrem.utils.geo.EnumDir;
 
 public class VoxToTvfLayer
 {
+	protected static final byte[] defaultLight = new byte[] {(byte) 0xFF, (byte) 0xFF, (byte) 0xFF, (byte) 0xFF};
+	
 	protected TVFLayerFaces tvf;
 	protected VOXFile vox;
 	protected Urchin urchin;
 
 	private HashSet<Byte> usedColors = new HashSet<Byte>();
 	private ArrayList<TVFFace> faces = new ArrayList<TVFFace>();
+	
+	protected boolean ao;
+	public short xOffset;
+	public short yOffset;
+	public short zOffset;
 
-	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox, Urchin urchin)
+	public VoxToTvfLayer(TVFLayerFaces tvf, VOXFile vox, Urchin urchin, boolean hasAo, short x, short y, short z)
 	{
 		this.tvf = tvf;
 		this.vox = vox;
 		this.urchin = urchin;
+		this.ao = hasAo;
+		this.xOffset = x;
+		this.yOffset = y;
+		this.zOffset = z;
 	}
 
 	public TVFLayerFaces make(TvfBuilder builder)
@@ -51,7 +62,7 @@ public class VoxToTvfLayer
 						{
 							EnumDir dir = dirs[d];
 							
-							if (builder.isOpen(i, j, k, dir))
+							if (builder.isOpen(i + this.xOffset, j + this.yOffset, k + this.zOffset, dir))
 							{
 								TVFFace f = new TVFFace();
 								f.x = (byte) (i & 0xFF);
@@ -59,6 +70,14 @@ public class VoxToTvfLayer
 								f.z = (byte) (k & 0xFF);
 								f.direction = dir.ind;
 								f.color = v;
+								if (this.ao)
+								{
+									builder.doFaceAo(f, i + this.xOffset, j + this.yOffset, k + this.zOffset);
+								}
+								else
+								{
+									f.lighting = defaultLight;
+								}
 								this.faces.add(f);
 								this.usedColors.add(v);
 							}

@@ -38,6 +38,7 @@ public class TvfExporter
 		{
 			TvfBuilder builder = new TvfBuilder(frame, indir, outdir, this);
 			TVFFile tvf = builder.convert();
+			System.out.println("Converted TVF File: " + frame.file);
 			String filen = frame.file.replaceAll("\\.", "/");
 			filen += ".tvf";
 			filen = outdir + "/" + filen;
